@@ -1,0 +1,16 @@
+# Use .NET 10 SDK for build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /app
+
+# Copy everything and restore
+COPY . ./
+RUN dotnet restore
+
+# Build the project
+RUN dotnet publish -c Release -o out
+
+# Final runtime image
+FROM mcr.microsoft.com/dotnet/runtime:10.0
+WORKDIR /app
+COPY --from=build /app/out .
+ENTRYPOINT ["dotnet", "AISmartAnalyzer.dll"]
